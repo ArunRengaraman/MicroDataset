@@ -12,7 +12,7 @@ st.write("Upload an image to detect the severity of diabetic retinopathy.")
 
 # Function to load model from GitHub
 def load_model_from_github():
-    url = "https://github.com/your-username/your-repo-name/raw/main/model.h5"  # Replace with your actual GitHub file URL
+    url = "https://github.com/ArunRengaraman/Microaneurysm-Detection-Deploy/blob/main/model.h5"  # Replace with your actual GitHub file URL
     model_path = "model.h5"
     
     # Download model if it does not exist
