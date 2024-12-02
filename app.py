@@ -1,9 +1,10 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 import cv2
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
+from PIL import Image
+import matplotlib.pyplot as plt
 
 # Load the pre-trained model
 MODEL_PATH = "model.h5"  # Update this to your saved model's path
@@ -33,59 +34,90 @@ def preprocess_image(image, target_size=(224, 224)):
     return image
 
 # Streamlit app
+st.set_page_config(
+    page_title="Diabetic Retinopathy Detection",
+    page_icon="🩺",
+    layout="wide"
+)
+
 st.title("🩺 Diabetic Retinopathy Detection")
 st.markdown("""
-Welcome to the **Diabetic Retinopathy Detection App**.  
-Upload a retinal image to detect the level of diabetic retinopathy using a pre-trained deep learning model.
+Welcome to the **Diabetic Retinopathy Detection App**!  
+Upload a **retinal image** to detect the level of diabetic retinopathy using an advanced AI model.
 """)
 
 # Sidebar information
 st.sidebar.header("About Diabetic Retinopathy")
 st.sidebar.write("""
-Diabetic retinopathy is a complication of diabetes that affects the eyes. It occurs when high blood sugar levels damage the blood vessels in the retina. The detection categories include:
+Diabetic retinopathy is a complication of diabetes that affects the retina due to high blood sugar levels. The detection categories include:
 - **No DR**: No diabetic retinopathy detected.
-- **Mild**: Early signs of retinopathy, such as small retinal changes.
-- **Moderate**: Increased retinal damage.
-- **Severe**: Severe retinal damage that could lead to vision loss.
+- **Mild**: Early retinal changes.
+- **Moderate**: Visible retinal damage.
+- **Severe**: Severe retinal damage, possible vision loss.
 - **Proliferative DR**: Advanced stage with new blood vessel growth.
 
-Early detection can help prevent vision loss. This app provides AI-based predictions to assist in diagnosis.
+**Note**: Early detection is key to preventing vision loss.
 """)
+st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/7/73/Diabetic_retinopathy%2C_fundus_photograph.jpg", caption="Example of Retinal Image", use_column_width=True)
 
 # File uploader
-uploaded_file = st.file_uploader("📂 Upload a retinal image...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📂 Upload a retinal image (JPEG/PNG)...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     # Read and display the uploaded image
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-    st.image(image, caption="📷 Uploaded Image", use_column_width=True)
-    st.write("🔍 Analyzing the image...")
+    # Validate image (check if it looks like a retina image)
+    if image.shape[0] < 300 or image.shape[1] < 300:  # Basic dimension check
+        st.error("⚠️ Please upload a valid retinal image.")
+    else:
+        col1, col2 = st.columns([2, 1])
 
-    # Preprocess the image
-    processed_image = preprocess_image(image, target_size=(IMAGE_SIZE, IMAGE_SIZE))
+        # Display uploaded image
+        with col1:
+            st.image(image, caption="📷 Uploaded Retinal Image", use_column_width=True)
+            st.write("🔍 Analyzing the image...")
 
-    # Predict
-    prediction = model.predict(processed_image)
-    predicted_class = np.argmax(prediction[0])  # Get class with the highest probability
+        # Preprocess the image
+        processed_image = preprocess_image(image, target_size=(IMAGE_SIZE, IMAGE_SIZE))
 
-    # Display results
-    st.markdown("## 🏆 Prediction Results")
-    st.write(f"### **Predicted Category:** {CLASSES[predicted_class]}")
+        # Predict
+        prediction = model.predict(processed_image)
+        predicted_class = np.argmax(prediction[0])  # Get class with the highest probability
 
-    # Add detailed description
-    if predicted_class == 0:
-        st.success("Great news! The model detected **No Diabetic Retinopathy** in the uploaded image.")
-    elif predicted_class == 1:
-        st.warning("**Mild Diabetic Retinopathy** detected. Consider scheduling an eye check-up for further evaluation.")
-    elif predicted_class == 2:
-        st.warning("**Moderate Diabetic Retinopathy** detected. It is recommended to consult an ophthalmologist.")
-    elif predicted_class == 3:
-        st.error("**Severe Diabetic Retinopathy** detected. Immediate medical attention is advised.")
-    elif predicted_class == 4:
-        st.error("**Proliferative Diabetic Retinopathy** detected. This is a serious condition requiring urgent treatment.")
+        # Display results
+        with col2:
+            st.markdown("## 🏆 Prediction Results")
+            st.write(f"### **Predicted Category:** {CLASSES[predicted_class]}")
+
+            # Add detailed description
+            if predicted_class == 0:
+                st.success("Great news! The model detected **No Diabetic Retinopathy**.")
+            elif predicted_class == 1:
+                st.warning("**Mild Diabetic Retinopathy** detected. Consider an eye check-up.")
+            elif predicted_class == 2:
+                st.warning("**Moderate Diabetic Retinopathy** detected. Consult an ophthalmologist.")
+            elif predicted_class == 3:
+                st.error("**Severe Diabetic Retinopathy** detected. Immediate medical attention is advised.")
+            elif predicted_class == 4:
+                st.error("**Proliferative Diabetic Retinopathy** detected. Urgent treatment required.")
+
+        # Visualizations
+        st.markdown("---")
+        st.markdown("## 📊 Prediction Analysis")
+        fig, ax = plt.subplots(figsize=(10, 5))
+        plt.bar(CLASSES, prediction[0], color=["green", "yellow", "orange", "red", "darkred"])
+        plt.title("Confidence Levels for Each Class")
+        plt.xlabel("Classes")
+        plt.ylabel("Confidence Score")
+        st.pyplot(fig)
+
+        # Additional Retina Image Segmentation/Visualization (if available)
+        st.markdown("---")
+        st.markdown("### 🧪 Future Work")
+        st.write("Retina segmentation, blood vessel mapping, and lesion detection can provide more detailed diagnostic insights.")
 
 # Add footer
 st.markdown("---")
-st.markdown("_Note: This app is for educational purposes only and should not replace professional medical advice._")
+st.markdown("_This app is for educational purposes only. For medical advice, please consult a professional._")
