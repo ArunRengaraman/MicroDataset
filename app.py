@@ -103,16 +103,7 @@ if uploaded_file is not None:
             elif predicted_class == 4:
                 st.error("**Proliferative Diabetic Retinopathy** detected. Urgent treatment required.")
 
-        # Visualizations
-        st.markdown("---")
-        st.markdown("## 📊 Prediction Analysis")
-        fig, ax = plt.subplots(figsize=(10, 5))
-        plt.bar(CLASSES, prediction[0], color=["green", "yellow", "orange", "red", "darkred"])
-        plt.title("Confidence Levels for Each Class")
-        plt.xlabel("Classes")
-        plt.ylabel("Confidence Score")
-        st.pyplot(fig)
-
+  
         # Additional Retina Image Segmentation/Visualization (if available)
         st.markdown("---")
         st.markdown("### 🧪 Future Work")
