@@ -4,19 +4,24 @@ from tensorflow.keras.preprocessing.image import img_to_array, load_img
 import numpy as np
 import requests
 from PIL import Image
+import os
 
 # Title and description
 st.title("Microaneurysm Detection")
 st.write("Upload an image to detect the severity of diabetic retinopathy.")
 
-# Load the model from GitHub
-@st.cache_resource
+# Function to load model from GitHub
 def load_model_from_github():
     url = "https://github.com/your-username/your-repo-name/raw/main/model.h5"  # Replace with your actual GitHub file URL
-    response = requests.get(url, stream=True)
-    with open("model.h5", "wb") as f:
-        f.write(response.content)
-    model = load_model("model.h5")
+    model_path = "model.h5"
+    
+    # Download model if it does not exist
+    if not os.path.exists(model_path):
+        response = requests.get(url, stream=True)
+        with open(model_path, "wb") as f:
+            f.write(response.content)
+    
+    model = load_model(model_path)
     return model
 
 model = load_model_from_github()
