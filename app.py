@@ -27,7 +27,7 @@ def load_model_from_github():
 model = load_model_from_github()
 
 # Define severity labels (customize as per your model)
-severity_labels = ["Normal", "Mild", "Moderate", "Severe", "Proliferated"]
+severity_labels = ["0", "1", "2", "3", "4"]
 
 # Image upload
 uploaded_file = st.file_uploader("Upload an image (JPG/PNG format)", type=["jpg", "jpeg", "png"])
