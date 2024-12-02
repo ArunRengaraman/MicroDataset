@@ -33,19 +33,35 @@ def preprocess_image(image, target_size=(224, 224)):
     return image
 
 # Streamlit app
-st.title("Diabetic Retinopathy Detection")
-st.markdown("Upload a retinal image to detect the level of diabetic retinopathy.")
+st.title("🩺 Diabetic Retinopathy Detection")
+st.markdown("""
+Welcome to the **Diabetic Retinopathy Detection App**.  
+Upload a retinal image to detect the level of diabetic retinopathy using a pre-trained deep learning model.
+""")
+
+# Sidebar information
+st.sidebar.header("About Diabetic Retinopathy")
+st.sidebar.write("""
+Diabetic retinopathy is a complication of diabetes that affects the eyes. It occurs when high blood sugar levels damage the blood vessels in the retina. The detection categories include:
+- **No DR**: No diabetic retinopathy detected.
+- **Mild**: Early signs of retinopathy, such as small retinal changes.
+- **Moderate**: Increased retinal damage.
+- **Severe**: Severe retinal damage that could lead to vision loss.
+- **Proliferative DR**: Advanced stage with new blood vessel growth.
+
+Early detection can help prevent vision loss. This app provides AI-based predictions to assist in diagnosis.
+""")
 
 # File uploader
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📂 Upload a retinal image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     # Read and display the uploaded image
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-    st.image(image, caption="Uploaded Image", use_column_width=True)
-    st.write("Processing...")
+    st.image(image, caption="📷 Uploaded Image", use_column_width=True)
+    st.write("🔍 Analyzing the image...")
 
     # Preprocess the image
     processed_image = preprocess_image(image, target_size=(IMAGE_SIZE, IMAGE_SIZE))
@@ -53,14 +69,23 @@ if uploaded_file is not None:
     # Predict
     prediction = model.predict(processed_image)
     predicted_class = np.argmax(prediction[0])  # Get class with the highest probability
-    confidence_scores = {CLASSES[i]: f"{prediction[0][i]:.2f}" for i in range(len(CLASSES))}
 
     # Display results
-    st.write("### Prediction Results")
-    st.write(f"**Predicted Class:** {CLASSES[predicted_class]}")
-    st.write("**Confidence Scores:**")
-    st.json(confidence_scores)
+    st.markdown("## 🏆 Prediction Results")
+    st.write(f"### **Predicted Category:** {CLASSES[predicted_class]}")
+
+    # Add detailed description
+    if predicted_class == 0:
+        st.success("Great news! The model detected **No Diabetic Retinopathy** in the uploaded image.")
+    elif predicted_class == 1:
+        st.warning("**Mild Diabetic Retinopathy** detected. Consider scheduling an eye check-up for further evaluation.")
+    elif predicted_class == 2:
+        st.warning("**Moderate Diabetic Retinopathy** detected. It is recommended to consult an ophthalmologist.")
+    elif predicted_class == 3:
+        st.error("**Severe Diabetic Retinopathy** detected. Immediate medical attention is advised.")
+    elif predicted_class == 4:
+        st.error("**Proliferative Diabetic Retinopathy** detected. This is a serious condition requiring urgent treatment.")
 
 # Add footer
 st.markdown("---")
-st.markdown("**Developed with ❤️ by Your Name**")
+st.markdown("_Note: This app is for educational purposes only and should not replace professional medical advice._")
