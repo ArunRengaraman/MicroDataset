@@ -6,7 +6,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 
 # Load the pre-trained model
-MODEL_PATH = "model_bucket.h5"  # Update this to your saved model's path
+MODEL_PATH = "model.h5"  # Update this to your saved model's path
 model = load_model(MODEL_PATH)
 
 # Constants
