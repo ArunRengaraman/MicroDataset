@@ -12,8 +12,8 @@ CLASSES = ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative DR']
 
 # Load models
 MODEL_PATHS = {
-    "MobileNet": "mobilenet_model.h5",  # Update with the actual path to your MobileNet model
-    "EfficientNet (modelE0)": "efficientnet_model.h5"  # Update with the actual path to your EfficientNet model
+    "MobileNet": "model.h5",  # Update with the actual path to your MobileNet model
+    "EfficientNet": "modelE0.h5"  # Update with the actual path to your EfficientNet model
 }
 
 # Sidebar for model selection
