@@ -4,4 +4,3 @@ tensorflow
 numpy
 pandas
 matplotlib
-google-cloud-vision
