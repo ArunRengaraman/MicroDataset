@@ -41,7 +41,7 @@ st.set_page_config(
 )
 
 st.title("🩺 Diabetic Retinopathy Detection")
-st.markdown("""
+st.markdown(""" 
 Welcome to the **Diabetic Retinopathy Detection App**!  
 Upload a **retinal image** to detect the level of diabetic retinopathy using an advanced AI model.
 """)
@@ -59,51 +59,54 @@ Diabetic retinopathy is a complication of diabetes that affects the retina due t
 **Note**: Early detection is key to preventing vision loss.
 """)
 
-
 # File uploader
 uploaded_file = st.file_uploader("📂 Upload a retinal image (JPEG/PNG)...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Read and display the uploaded image
+    # Read and decode the image
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-    # Validate image (check if it looks like a retina image)
-    if image.shape[0] < 300 or image.shape[1] < 300:  # Basic dimension check
-        st.error("⚠️ Please upload a valid retinal image.")
+    # Validate image: Check basic properties (dimensions, color format, etc.)
+    if image is None:
+        st.error("⚠️ The uploaded file is not a valid image. Please upload a valid image file.")
+    elif image.shape[0] < 300 or image.shape[1] < 300:  # Basic dimension check
+        st.error("⚠️ Please upload a higher resolution retinal image (at least 300x300).")
     else:
-        col1, col2 = st.columns([2, 1])
+        # Check for color (retinal images are typically colored, though you may modify based on your use case)
+        if len(image.shape) < 3 or image.shape[2] != 3:
+            st.error("⚠️ Please upload a valid colored retinal image (RGB).")
+        else:
+            col1, col2 = st.columns([2, 1])
 
-        # Display uploaded image
-        with col1:
-            st.image(image, caption="📷 Uploaded Retinal Image", use_column_width=True)
-            
+            # Display uploaded image
+            with col1:
+                st.image(image, caption="📷 Uploaded Retinal Image", use_column_width=True)
 
-        # Preprocess the image
-        processed_image = preprocess_image(image, target_size=(IMAGE_SIZE, IMAGE_SIZE))
+            # Preprocess the image
+            processed_image = preprocess_image(image, target_size=(IMAGE_SIZE, IMAGE_SIZE))
 
-        # Predict
-        prediction = model.predict(processed_image)
-        predicted_class = np.argmax(prediction[0])  # Get class with the highest probability
+            # Predict
+            prediction = model.predict(processed_image)
+            predicted_class = np.argmax(prediction[0])  # Get class with the highest probability
 
-        # Display results
-        with col2:
-            st.markdown("## 🏆 Prediction Results")
-            st.write(f"### **Predicted Category:** {CLASSES[predicted_class]}")
+            # Display results
+            with col2:
+                st.markdown("## 🏆 Prediction Results")
+                st.write(f"### **Predicted Category:** {CLASSES[predicted_class]}")
 
-            # Add detailed description
-            if predicted_class == 0:
-                st.success("Great news! The model detected **No Diabetic Retinopathy**.")
-            elif predicted_class == 1:
-                st.warning("**Mild Diabetic Retinopathy** detected. Consider an eye check-up.")
-            elif predicted_class == 2:
-                st.warning("**Moderate Diabetic Retinopathy** detected. Consult an ophthalmologist.")
-            elif predicted_class == 3:
-                st.error("**Severe Diabetic Retinopathy** detected. Immediate medical attention is advised.")
-            elif predicted_class == 4:
-                st.error("**Proliferative Diabetic Retinopathy** detected. Urgent treatment required.")
+                # Add detailed description
+                if predicted_class == 0:
+                    st.success("Great news! The model detected **No Diabetic Retinopathy**.")
+                elif predicted_class == 1:
+                    st.warning("**Mild Diabetic Retinopathy** detected. Consider an eye check-up.")
+                elif predicted_class == 2:
+                    st.warning("**Moderate Diabetic Retinopathy** detected. Consult an ophthalmologist.")
+                elif predicted_class == 3:
+                    st.error("**Severe Diabetic Retinopathy** detected. Immediate medical attention is advised.")
+                elif predicted_class == 4:
+                    st.error("**Proliferative Diabetic Retinopathy** detected. Urgent treatment required.")
 
-  
         # Additional Retina Image Segmentation/Visualization (if available)
         st.markdown("---")
         st.markdown("### 🧪 Future Work")
