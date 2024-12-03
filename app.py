@@ -6,14 +6,21 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from PIL import Image
 import matplotlib.pyplot as plt
 
+# Streamlit app configuration must be at the top
+st.set_page_config(
+    page_title="Diabetic Retinopathy Detection",
+    page_icon="🩺",
+    layout="wide"
+)
+
 # Constants
 IMAGE_SIZE = 224
 CLASSES = ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative DR']
 
 # Load models
 MODEL_PATHS = {
-    "MobileNet": "model.h5",  # Update with the actual path to your MobileNet model
-    "EfficientNet": "modelE0.h5"  # Update with the actual path to your EfficientNet model
+    "MobileNet": "mobilenet_model.h5",  # Update with the actual path to your MobileNet model
+    "EfficientNet (modelE0)": "efficientnet_model.h5"  # Update with the actual path to your EfficientNet model
 }
 
 # Sidebar for model selection
@@ -49,13 +56,7 @@ def preprocess_image(image, target_size=(224, 224)):
     image = image / 255.0  # Normalize pixel values to [0, 1]
     return image
 
-# Streamlit app
-st.set_page_config(
-    page_title="Diabetic Retinopathy Detection",
-    page_icon="🩺",
-    layout="wide"
-)
-
+# App header and introduction
 st.title("🩺 Diabetic Retinopathy Detection")
 st.markdown(""" 
 Welcome to the **Diabetic Retinopathy Detection App**!  
