@@ -1,5 +1,6 @@
 streamlit
+opencv-python
 tensorflow
-Pillow
-requests
 numpy
+pandas
+matplotlib
