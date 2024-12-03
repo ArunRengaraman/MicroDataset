@@ -61,7 +61,7 @@ Diabetic retinopathy is a complication of diabetes that affects the retina due t
 
 # Preloaded images (update with your GitHub URLs)
 PRELOADED_IMAGES = {
-    "No DR": "https://raw.githubusercontent.com/your-repo/no_dr_image.jpg",
+    "No DR": "https://github.com/ArunRengaraman/Microaneurysm-Detection-Deploy/blob/main/No%20Diabetic%20Retinopathy.jpeg",
     "Mild": "https://raw.githubusercontent.com/your-repo/mild_image.jpg",
     "Moderate": "https://raw.githubusercontent.com/your-repo/moderate_image.jpg",
     "Severe": "https://raw.githubusercontent.com/your-repo/severe_image.jpg",
