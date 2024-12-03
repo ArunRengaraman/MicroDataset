@@ -77,7 +77,7 @@ if uploaded_file is not None:
         # Display uploaded image
         with col1:
             st.image(image, caption="📷 Uploaded Retinal Image", use_column_width=True)
-            st.write("🔍 Analyzing the image...")
+            
 
         # Preprocess the image
         processed_image = preprocess_image(image, target_size=(IMAGE_SIZE, IMAGE_SIZE))
