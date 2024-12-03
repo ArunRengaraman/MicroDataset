@@ -58,7 +58,7 @@ Diabetic retinopathy is a complication of diabetes that affects the retina due t
 
 **Note**: Early detection is key to preventing vision loss.
 """)
-st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/7/73/Diabetic_retinopathy%2C_fundus_photograph.jpg", caption="Example of Retinal Image", use_column_width=True)
+
 
 # File uploader
 uploaded_file = st.file_uploader("📂 Upload a retinal image (JPEG/PNG)...", type=["jpg", "jpeg", "png"])
