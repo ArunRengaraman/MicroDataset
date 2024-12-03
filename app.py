@@ -4,7 +4,7 @@ import cv2
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from PIL import Image
-import matplotlib.pyplot as plt
+import requests
 
 # Load the pre-trained model
 MODEL_PATH = "model.h5"  # Update this to your saved model's path
@@ -43,7 +43,7 @@ st.set_page_config(
 st.title("🩺 Diabetic Retinopathy Detection")
 st.markdown("""
 Welcome to the **Diabetic Retinopathy Detection App**!  
-Upload a **retinal image** to detect the level of diabetic retinopathy using an advanced AI model.
+Upload a **retinal image** or use a **preloaded example** to detect the level of diabetic retinopathy using an advanced AI model.
 """)
 
 # Sidebar information
@@ -59,24 +59,53 @@ Diabetic retinopathy is a complication of diabetes that affects the retina due t
 **Note**: Early detection is key to preventing vision loss.
 """)
 
+# Preloaded images (update with your GitHub URLs)
+PRELOADED_IMAGES = {
+    "No DR": "https://raw.githubusercontent.com/your-repo/no_dr_image.jpg",
+    "Mild": "https://raw.githubusercontent.com/your-repo/mild_image.jpg",
+    "Moderate": "https://raw.githubusercontent.com/your-repo/moderate_image.jpg",
+    "Severe": "https://raw.githubusercontent.com/your-repo/severe_image.jpg",
+    "Proliferative DR": "https://raw.githubusercontent.com/your-repo/proliferative_image.jpg",
+}
 
 # File uploader
 uploaded_file = st.file_uploader("📂 Upload a retinal image (JPEG/PNG)...", type=["jpg", "jpeg", "png"])
 
+# Preloaded images dropdown
+st.markdown("## 🎯 Use Preloaded Example Images")
+selected_class = st.selectbox("Select a class to load a preloaded image:", options=["Choose"] + list(PRELOADED_IMAGES.keys()))
+
+image = None
+
+# Process uploaded file
 if uploaded_file is not None:
-    # Read and display the uploaded image
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-    # Validate image (check if it looks like a retina image)
+# Process preloaded images
+elif selected_class != "Choose":
+    image_url = PRELOADED_IMAGES[selected_class]
+    response = requests.get(image_url, stream=True)
+
+    if response.status_code == 200:
+        image_bytes = np.asarray(bytearray(response.content), dtype=np.uint8)
+        image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
+    else:
+        st.error("⚠️ Could not load the preloaded image. Please try again.")
+
+# If an image is loaded, process and predict
+if image is not None:
     if image.shape[0] < 300 or image.shape[1] < 300:  # Basic dimension check
         st.error("⚠️ Please upload a valid retinal image.")
     else:
         col1, col2 = st.columns([2, 1])
 
-        # Display uploaded image
+        # Display the image
         with col1:
-            st.image(image, caption="📷 Uploaded Retinal Image", use_column_width=True)
+            if uploaded_file is not None:
+                st.image(image, caption="📷 Uploaded Retinal Image", use_column_width=True)
+            else:
+                st.image(image, caption=f"📷 Preloaded Image - {selected_class}", use_column_width=True)
             st.write("🔍 Analyzing the image...")
 
         # Preprocess the image
@@ -103,11 +132,7 @@ if uploaded_file is not None:
             elif predicted_class == 4:
                 st.error("**Proliferative Diabetic Retinopathy** detected. Urgent treatment required.")
 
-  
-        # Additional Retina Image Segmentation/Visualization (if available)
         st.markdown("---")
-        st.markdown("### 🧪 Future Work")
-        st.write("Retina segmentation, blood vessel mapping, and lesion detection can provide more detailed diagnostic insights.")
 
 # Add footer
 st.markdown("---")
