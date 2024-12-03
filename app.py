@@ -6,13 +6,29 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from PIL import Image
 import matplotlib.pyplot as plt
 
-# Load the pre-trained model
-MODEL_PATH = "model.h5"  # Update this to your saved model's path
-model = load_model(MODEL_PATH)
-
 # Constants
 IMAGE_SIZE = 224
 CLASSES = ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative DR']
+
+# Load models
+MODEL_PATHS = {
+    "MobileNet": "mobilenet_model.h5",  # Update with the actual path to your MobileNet model
+    "EfficientNet (modelE0)": "efficientnet_model.h5"  # Update with the actual path to your EfficientNet model
+}
+
+# Sidebar for model selection
+st.sidebar.header("Model Selection")
+selected_model_name = st.sidebar.selectbox(
+    "Choose a model for prediction:",
+    list(MODEL_PATHS.keys())
+)
+
+# Load the selected model
+@st.cache_resource
+def load_selected_model(model_name):
+    return load_model(MODEL_PATHS[model_name])
+
+model = load_selected_model(selected_model_name)
 
 # Define a function to preprocess the image
 def preprocess_image(image, target_size=(224, 224)):
@@ -93,6 +109,7 @@ if uploaded_file is not None:
             # Display results
             with col2:
                 st.markdown("## 🏆 Prediction Results")
+                st.write(f"### **Model Used:** {selected_model_name}")
                 st.write(f"### **Predicted Category:** {CLASSES[predicted_class]}")
 
                 # Add detailed description
